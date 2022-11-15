@@ -1,3 +1,4 @@
+import time
 import pygame
 import random
 from enum import Enum
@@ -129,16 +130,54 @@ class SnakeGame:
             return True
         return False
 
+    # restart the game
+    def restart(self):
+        self.direction = Direction.RIGHT
+        self.head = Point(self.w / 2, self.h / 2)
+        self.snake = [self.head,
+                      Point(self.head.x - BLOCK_SIZE, self.head.y),
+                      Point(self.head.x - (2 * BLOCK_SIZE), self.head.y)]
+        self.score = 0
+        self.food = None
+        self._place__food()
+
+    def show_text(self, text):
+        texts = text.split("\n")
+        for i in range(len(texts)):
+            currentText = texts[i]
+            currentText = font.render(currentText, True, WHITE)
+            textRect = currentText.get_rect()
+            textRect.center = (self.w // 2, self.h // 2 + i * 50)
+            self.display.blit(currentText, textRect)
+            pygame.display.flip()
+
+
+    # method that clear shown text
+    def clear_text(self):
+        self.display.fill(BLACK)
+        pygame.display.flip()
 
 if __name__ == "__main__":
     game = SnakeGame()
 
-    # Game loop
-    # game_over=False
     while True:
         game_over, score = game.play_step()
         if (game_over == True):
-            break
-    print('Final Score', score)
-
-    pygame.quit()
+            game.show_text("Game Over :-p")
+            time.sleep(2)
+            game.clear_text()
+            game.show_text("Press r to restart \n or q to quit")
+            choiceMade = False
+            while choiceMade == False:
+                for event in pygame.event.get():
+                    if (event.type == pygame.KEYDOWN):
+                        if (event.key == pygame.K_r):
+                            print("Restarting")
+                            game.restart()
+                            choiceMade = True
+                        elif (event.key == pygame.K_q):
+                            pygame.quit()
+                            quit()
+                        else:
+                            continue
+            game.clear_text()
